@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SecretQuest — Binary Secret Decoder</title>
+
+  <style>
+    :root {
+      --bg: #07111f;
+      --surface: #0d1b2a;
+      --surface-light: #122338;
+      --green: #39ff88;
+      --green-dark: #16c765;
+      --text: #eef5ff;
+      --muted: #9aacc2;
+      --border: #26384d;
+      --danger: #ff6b6b;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 90px;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(1100px, 92%);
+      margin: auto;
+    }
+
+    /* NAVBAR */
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7, 17, 31, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .navbar {
+      min-height: 74px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding-left: 20px;
+    }
+
+    /* PROFESSIONAL LOGO */
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: -20px;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+      border: 1px solid rgba(57, 255, 136, 0.4);
+      border-radius: 10px;
+      background: rgba(57, 255, 136, 0.08);
+      box-shadow: 0 0 16px rgba(57, 255, 136, 0.08);
+      transition: 0.2s ease;
+    }
+
+    .logo-mark::before {
+      content: "";
+      position: absolute;
+      width: 12px;
+      height: 10px;
+      top: 7px;
+      border: 2px solid var(--green);
+      border-bottom: none;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .logo-mark span {
+      width: 18px;
+      height: 14px;
+      position: absolute;
+      top: 15px;
+      border-radius: 4px;
+      background: var(--green);
+    }
+
+    .logo-mark span::after {
+      content: "";
+      position: absolute;
+      width: 3px;
+      height: 5px;
+      left: 7.5px;
+      top: 4px;
+      border-radius: 3px;
+      background: #07111f;
+    }
+
+    .logo-name {
+      color: var(--text);
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+    }
+
+    .logo-name span {
+      color: var(--green);
+    }
+
+    .logo:hover .logo-mark {
+      border-color: var(--green);
+      box-shadow: 0 0 18px rgba(57, 255, 136, 0.18);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      font-size: 0.92rem;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--green);
+    }
+
+    /* HERO */
+
+    .hero {
+      min-height: 490px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      align-items: center;
+      gap: 45px;
+      padding: 75px 0;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--green);
+      background: rgba(57, 255, 136, 0.08);
+      border: 1px solid rgba(57, 255, 136, 0.25);
+      padding: 7px 13px;
+      border-radius: 30px;
+      font-size: 0.82rem;
+      margin-bottom: 22px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.7rem, 6vw, 4.6rem);
+      line-height: 1.08;
+      letter-spacing: -2px;
+      margin-bottom: 22px;
+    }
+
+    .hero h1 span {
+      color: var(--green);
+    }
+
+    .hero p {
+      color: var(--muted);
+      max-width: 510px;
+      font-size: 1.05rem;
+      margin-bottom: 30px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 13px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid var(--green);
+      border-radius: 8px;
+      padding: 11px 19px;
+      font-weight: 700;
+      transition: 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: #04130b;
+    }
+
+    .btn-primary:hover {
+      background: #70ffaa;
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--green);
+    }
+
+    .btn-outline:hover {
+      background: rgba(57, 255, 136, 0.09);
+    }
+
+    /* HERO TERMINAL */
+
+    .terminal {
+      background: #091522;
+      border: 1px solid #294058;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.25);
+    }
+
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 14px 17px;
+      border-bottom: 1px solid var(--border);
+      background: #0d1b2a;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .dot-red {
+      background: #ff6464;
+    }
+
+    .dot-yellow {
+      background: #ffd166;
+    }
+
+    .dot-green {
+      background: #39ff88;
+    }
+
+    .terminal-title {
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-left: 8px;
+    }
+
+    .terminal-body {
+      padding: 25px;
+      font-family: "Courier New", monospace;
+      font-size: 0.94rem;
+      overflow-wrap: anywhere;
+    }
+
+    .terminal-line {
+      margin-bottom: 15px;
+    }
+
+    .terminal-green {
+      color: var(--green);
+    }
+
+    .terminal-muted {
+      color: #6e8aa6;
+    }
+
+    .terminal-output {
+      color: #c3d6e9;
+      line-height: 1.9;
+      letter-spacing: 1px;
+    }
+
+    .terminal-success {
+      color: var(--green);
+      margin-top: 17px;
+    }
+
+    /* GENERAL SECTIONS */
+
+    .content-section {
+      padding: 65px 0;
+      border-top: 1px solid var(--border);
+      scroll-margin-top: 80px;
+    }
+
+    .section-heading {
+      margin-bottom: 30px;
+      padding: 23px 25px;
+      background: linear-gradient(
+        110deg,
+        rgba(57, 255, 136, 0.07),
+        rgba(13, 27, 42, 0.75)
+      );
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--green);
+      border-radius: 10px;
+    }
+
+    .section-heading h2 {
+      font-size: clamp(1.7rem, 4vw, 2.35rem);
+      margin-bottom: 7px;
+    }
+
+    .section-heading h2 span {
+      color: var(--green);
+    }
+
+    .section-heading p {
+      color: var(--muted);
+      max-width: 650px;
+    }
+
+    /* CARDS */
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 25px;
+      min-width: 0;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(57, 255, 136, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .card h3 {
+      font-size: 1.18rem;
+      margin-bottom: 7px;
+    }
+
+    .card-description {
+      color: var(--muted);
+      font-size: 0.91rem;
+      margin-bottom: 20px;
+    }
+
+    .field-label {
+      display: block;
+      color: #c8d6e6;
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin: 16px 0 8px;
+    }
+
+    textarea,
+    input,
+    select {
+      width: 100%;
+      color: var(--text);
+      background: #071321;
+      border: 1px solid #2b4057;
+      border-radius: 8px;
+      padding: 12px 13px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    textarea {
+      min-height: 125px;
+      resize: vertical;
+    }
+
+    textarea:focus,
+    input:focus,
+    select:focus {
+      border-color: var(--green);
+    }
+
+    textarea::placeholder,
+    input::placeholder {
+      color: #647b93;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .action-btn {
+      background: var(--green);
+      color: #04130b;
+      border: 1px solid var(--green);
+      border-radius: 7px;
+      padding: 10px 15px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      transition: 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: #75ffab;
+    }
+
+    .secondary-btn {
+      background: transparent;
+      color: var(--green);
+      border: 1px solid #38614c;
+      border-radius: 7px;
+      padding: 10px 15px;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .secondary-btn:hover {
+      background: rgba(57, 255, 136, 0.08);
+    }
+
+    .output-box {
+      background: #071321;
+      border: 1px dashed #36516a;
+      border-radius: 8px;
+      padding: 14px;
+      min-height: 65px;
+      margin-top: 16px;
+      color: var(--green);
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+      font-family: "Courier New", monospace;
+      font-size: 0.9rem;
+    }
+
+    .status-message {
+      min-height: 23px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .status-message.error {
+      color: var(--danger);
+    }
+
+    .status-message.success {
+      color: var(--green);
+    }
+
+    /* NUMBER CONVERTER */
+
+    .converter-card {
+      max-width: 760px;
+    }
+
+    .converter-input-row {
+      display: grid;
+      grid-template-columns: 1fr 180px;
+      gap: 12px;
+    }
+
+    .number-results {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .number-result {
+      background: #071321;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 15px;
+      min-width: 0;
+    }
+
+    .number-result span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-bottom: 7px;
+    }
+
+    .number-result strong {
+      display: block;
+      color: var(--green);
+      font-family: "Courier New", monospace;
+      overflow-wrap: anywhere;
+    }
+
+    /* 8085 SECTION */
+
+    .program-card {
+      max-width: 800px;
+    }
+
+    .program-toggle {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .program-panel {
+      display: none;
+      margin-top: 22px;
+    }
+
+    .program-panel.visible {
+      display: block;
+    }
+
+    .code-block {
+      background: #06111d;
+      border: 1px solid #294058;
+      border-radius: 9px;
+      padding: 22px;
+      color: var(--green);
+      font-family: "Courier New", monospace;
+      font-size: 1rem;
+      line-height: 1.9;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+
+    .explanation {
+      background: rgba(57, 255, 136, 0.05);
+      border: 1px solid rgba(57, 255, 136, 0.2);
+      border-radius: 9px;
+      padding: 17px;
+      margin-top: 17px;
+    }
+
+    .explanation h4 {
+      color: var(--green);
+      margin-bottom: 8px;
+    }
+
+    .explanation p,
+    .explanation li {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .explanation ul {
+      padding-left: 21px;
+      margin-top: 9px;
+    }
+
+    /* UPDATED SIMPLE CENTERED FOOTER */
+
+    footer {
+      padding: 22px 0;
+      background: #050d17;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .footer-copyright {
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-align: center;
+    }
+
+    .footer-copyright span {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* RESPONSIVE DESIGN */
+
+    @media (max-width: 800px) {
+      .navbar {
+        flex-direction: column;
+        justify-content: center;
+        padding: 15px 0;
+        gap: 12px;
+      }
+
+      .logo {
+        margin-left: 0;
+      }
+
+      .nav-links {
+        gap: 18px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        gap: 35px;
+        padding: 55px 0;
+      }
+
+      .hero-copy {
+        text-align: center;
+      }
+
+      .hero-copy p {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .hero-actions {
+        justify-content: center;
+      }
+
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .nav-links {
+        gap: 12px;
+      }
+
+      .nav-links a {
+        font-size: 0.82rem;
+      }
+
+      .logo-name {
+        font-size: 1.3rem;
+      }
+
+      .hero h1 {
+        letter-spacing: -1px;
+      }
+
+      .terminal-body {
+        padding: 18px;
+        font-size: 0.82rem;
+      }
+
+      .content-section {
+        padding: 45px 0;
+      }
+
+      .section-heading {
+        padding: 18px;
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      .converter-input-row {
+        grid-template-columns: 1fr;
+      }
+
+      .number-results {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <header>
+    <div class="container navbar">
+      <a class="logo" href="#home" aria-label="SecretQuest Home">
+        <span class="logo-mark" aria-hidden="true">
+          <span></span>
+        </span>
+        <span class="logo-name">Secret<span>Quest</span></span>
+      </a>
+
+      <nav aria-label="Main navigation">
+        <ul class="nav-links">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#decoder">Decoder</a></li>
+          <li><a href="#converter">Number Converter</a></li>
+          <li><a href="#8085">8085 Program</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- HERO SECTION -->
+    <section class="container hero" id="home">
+      <div class="hero-copy">
+        <div class="hero-badge">
+          <span>●</span> Binary Secret Decoder
+        </div>
+
+        <h1>Unlock the <span>Secret.</span></h1>
+
+        <p>
+          Decode hidden messages, convert number systems, and explore
+          8085 microprocessor instructions — all in one place.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#decoder" class="btn btn-primary">Start Decoding →</a>
+          <a href="#8085" class="btn btn-outline">Explore 8085</a>
+        </div>
+      </div>
+
+      <div class="terminal">
+        <div class="terminal-header">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+          <span class="terminal-title">secretquest_terminal.exe</span>
+        </div>
+
+        <div class="terminal-body">
+          <div class="terminal-line terminal-muted">
+            Initializing SecretQuest...
+          </div>
+
+          <div class="terminal-line">
+            <span class="terminal-green">guest@secretquest:~$</span>
+            decode --binary
+          </div>
+
+          <div class="terminal-output">
+            01001000 01100101 01101100<br>
+            01101100 01101111 00100001
+          </div>
+
+          <div class="terminal-line terminal-success">
+            ✓ Message decoded: Hello!
+          </div>
+
+          <div class="terminal-line terminal-muted">
+            Ready for your next secret...
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECRET MESSAGE DECODER -->
+    <section class="content-section" id="decoder">
+      <div class="container">
+        <div class="section-heading">
+          <h2>Secret Message <span>Decoder</span></h2>
+          <p>
+            Convert normal text into binary code or decode binary back
+            into a readable message.
+          </p>
+        </div>
+
+        <div class="card-grid">
+
+          <!-- TEXT TO BINARY -->
+          <div class="card">
+            <h3>Text → Binary</h3>
+            <p class="card-description">
+              Transform your message into 8-bit binary groups.
+            </p>
+
+            <label class="field-label" for="plainText">
+              Enter your message
+            </label>
+
+            <textarea
+              id="plainText"
+              placeholder="Type your secret message here..."
+            ></textarea>
+
+            <div class="button-row">
+              <button class="action-btn" id="encodeBtn" type="button">
+                Encode Message
+              </button>
+
+              <button class="secondary-btn" id="clearTextBtn" type="button">
+                Clear
+              </button>
+            </div>
+
+            <label class="field-label" for="binaryOutput">
+              Binary output
+            </label>
+
+            <div class="output-box" id="binaryOutput" aria-live="polite">Your binary message will appear here...</div>
+
+            <div class="button-row">
+              <button class="secondary-btn" id="copyBinaryBtn" type="button">
+                Copy Binary
+              </button>
+            </div>
+
+            <p class="status-message" id="encodeStatus" aria-live="polite"></p>
+          </div>
+
+          <!-- BINARY TO TEXT -->
+          <div class="card">
+            <h3>Binary → Text</h3>
+            <p class="card-description">
+              Decode 8-bit binary groups into readable text.
+            </p>
+
+            <label class="field-label" for="binaryInput">
+              Enter binary code
+            </label>
+
+            <textarea
+              id="binaryInput"
+              placeholder="Example: 01001000 01101001"
+            ></textarea>
+
+            <div class="button-row">
+              <button class="action-btn" id="decodeBtn" type="button">
+                Decode Message
+              </button>
+
+              <button class="secondary-btn" id="clearBinaryBtn" type="button">
+                Clear
+              </button>
+            </div>
+
+            <label class="field-label" for="decodedOutput">
+              Decoded message
+            </label>
+
+            <div class="output-box" id="decodedOutput" aria-live="polite">Your decoded message will appear here...</div>
+
+            <div class="button-row">
+              <button class="secondary-btn" id="copyDecodedBtn" type="button">
+                Copy Text
+              </button>
+            </div>
+
+            <p class="status-message" id="decodeStatus" aria-live="polite"></p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- NUMBER SYSTEM CONVERTER -->
+    <section class="content-section" id="converter">
+      <div class="container">
+        <div class="section-heading">
+          <h2>Number System <span>Converter</span></h2>
+          <p>
+            Convert numbers between binary, decimal, and hexadecimal
+            number systems instantly.
+          </p>
+        </div>
+
+        <div class="card converter-card">
+          <h3>Universal Number Converter</h3>
+          <p class="card-description">
+            Select the input format and enter a valid number.
+          </p>
+
+          <div class="converter-input-row">
+            <div>
+              <label class="field-label" for="numberInput">
+                Enter number
+              </label>
+
+              <input
+                type="text"
+                id="numberInput"
+                placeholder="Example: 1010"
+                autocomplete="off"
+              >
+            </div>
+
+            <div>
+              <label class="field-label" for="numberBase">
+                Input format
+              </label>
+
+              <select id="numberBase">
+                <option value="2">Binary (Base 2)</option>
+                <option value="10">Decimal (Base 10)</option>
+                <option value="16">Hexadecimal (Base 16)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="button-row">
+            <button class="action-btn" id="convertNumberBtn" type="button">
+              Convert Number
+            </button>
+
+            <button class="secondary-btn" id="clearNumberBtn" type="button">
+              Clear
+            </button>
+          </div>
+
+          <p class="status-message" id="numberStatus" aria-live="polite"></p>
+
+          <div class="number-results">
+            <div class="number-result">
+              <span>Binary (Base 2)</span>
+              <strong id="binaryResult">—</strong>
+            </div>
+
+            <div class="number-result">
+              <span>Decimal (Base 10)</span>
+              <strong id="decimalResult">—</strong>
+            </div>
+
+            <div class="number-result">
+              <span>Hexadecimal (Base 16)</span>
+              <strong id="hexResult">—</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8085 ASSEMBLY PROGRAM -->
+    <section class="content-section" id="8085">
+      <div class="container">
+        <div class="section-heading">
+          <h2>8085 Assembly <span>Program</span></h2>
+          <p>
+            Explore a simple 8085 program that masks all bits except
+            the least significant bit.
+          </p>
+        </div>
+
+        <div class="card program-card">
+          <div class="program-toggle">
+            <div>
+              <h3>Check the Least Significant Bit</h3>
+              <p class="card-description">
+                Click below to view the program and its explanation.
+              </p>
+            </div>
+
+            <button
+              class="action-btn"
+              id="toggleProgramBtn"
+              type="button"
+              aria-expanded="false"
+              aria-controls="programPanel"
+            >
+              Show Program
+            </button>
+          </div>
+
+          <div class="program-panel" id="programPanel">
+            <label class="field-label">8085 Assembly Code</label>
+
+            <pre class="code-block">LDA 2050H
+ANI 01H
+STA 2051H
+HLT</pre>
+
+            <div class="explanation">
+              <h4>Program Explanation</h4>
+
+              <ul>
+                <li>
+                  <strong>LDA 2050H:</strong>
+                  Loads the accumulator with the data stored at memory
+                  location 2050H.
+                </li>
+
+                <li>
+                  <strong>ANI 01H:</strong>
+                  Performs a bitwise AND operation between the accumulator
+                  and 01H. This keeps only the least significant bit.
+                </li>
+
+                <li>
+                  <strong>STA 2051H:</strong>
+                  Stores the result at memory location 2051H.
+                </li>
+
+                <li>
+                  <strong>HLT:</strong>
+                  Stops program execution.
+                </li>
+              </ul>
+            </div>
+
+            <div class="explanation">
+              <h4>Example</h4>
+              <p>
+                If the value at memory location 2050H is 03H
+                (binary 00000011), applying AND with 01H gives
+                01H (binary 00000001). The result is stored at 2051H.
+              </p>
+            </div>
+
+            <p class="status-message">
+              Note: Assemble and execute this program in a simulator
+              such as GNUSim8085. This website displays the code and
+              explanation; it does not execute 8085 instructions.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- UPDATED SIMPLE CENTERED FOOTER -->
+  <footer>
+    <div class="container footer-content">
+      <p class="footer-copyright">
+        © <span id="currentYear"></span>
+        <span>SecretQuest</span>. All rights reserved.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // HELPER: SHOW STATUS MESSAGES
+
+    function showStatus(elementId, message, type = "") {
+      const element = document.getElementById(elementId);
+
+      element.textContent = message;
+      element.className = "status-message";
+
+      if (type) {
+        element.classList.add(type);
+      }
+    }
+
+    // HELPER: COPY TEXT TO CLIPBOARD
+
+    async function copyToClipboard(text, statusId, itemName) {
+      if (!text || text.startsWith("Your ")) {
+        showStatus(statusId, "Nothing to copy yet.", "error");
+        return;
+      }
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const temporaryTextArea = document.createElement("textarea");
+
+          temporaryTextArea.value = text;
+          temporaryTextArea.style.position = "fixed";
+          temporaryTextArea.style.opacity = "0";
+
+          document.body.appendChild(temporaryTextArea);
+          temporaryTextArea.select();
+
+          const copied = document.execCommand("copy");
+          temporaryTextArea.remove();
+
+          if (!copied) {
+            throw new Error("Copy failed");
+          }
+        }
+
+        showStatus(
+          statusId,
+          itemName + " copied successfully!",
+          "success"
+        );
+      } catch (error) {
+        showStatus(
+          statusId,
+          "Copy failed. Please select and copy the text manually.",
+          "error"
+        );
+      }
+    }
+
+    // TEXT TO BINARY
+
+    document.getElementById("encodeBtn").addEventListener("click", function () {
+      const text = document.getElementById("plainText").value;
+      const output = document.getElementById("binaryOutput");
+
+      if (text.length === 0) {
+        output.textContent = "Your binary message will appear here...";
+        showStatus("encodeStatus", "Please enter a message first.", "error");
+        return;
+      }
+
+      try {
+        const bytes = new TextEncoder().encode(text);
+
+        const binary = Array.from(bytes)
+          .map(byte => byte.toString(2).padStart(8, "0"))
+          .join(" ");
+
+        output.textContent = binary;
+
+        showStatus(
+          "encodeStatus",
+          "Message encoded successfully!",
+          "success"
+        );
+      } catch (error) {
+        showStatus(
+          "encodeStatus",
+          "Unable to encode this message.",
+          "error"
+        );
+      }
+    });
+
+    // CLEAR TEXT TO BINARY
+
+    document.getElementById("clearTextBtn").addEventListener("click", function () {
+      document.getElementById("plainText").value = "";
+
+      document.getElementById("binaryOutput").textContent =
+        "Your binary message will appear here...";
+
+      showStatus("encodeStatus", "");
+    });
+
+    // COPY BINARY OUTPUT
+
+    document.getElementById("copyBinaryBtn").addEventListener("click", function () {
+      const text = document.getElementById("binaryOutput").textContent;
+
+      copyToClipboard(text, "encodeStatus", "Binary output");
+    });
+
+    // BINARY TO TEXT
+
+    document.getElementById("decodeBtn").addEventListener("click", function () {
+      const input = document.getElementById("binaryInput").value.trim();
+      const output = document.getElementById("decodedOutput");
+
+      if (!input) {
+        output.textContent = "Your decoded message will appear here...";
+
+        showStatus(
+          "decodeStatus",
+          "Please enter binary code first.",
+          "error"
+        );
+
+        return;
+      }
+
+      const groups = input.split(/\s+/);
+      const validBinary = groups.every(group => /^[01]{8}$/.test(group));
+
+      if (!validBinary) {
+        showStatus(
+          "decodeStatus",
+          "Invalid binary code. Enter groups of 8 binary digits, such as 01001000 01101001.",
+          "error"
+        );
+
+        return;
+      }
+
+      try {
+        const bytes = new Uint8Array(
+          groups.map(group => parseInt(group, 2))
+        );
+
+        const decoder = new TextDecoder("utf-8", { fatal: true });
+        const decodedText = decoder.decode(bytes);
+
+        output.textContent = decodedText;
+
+        showStatus(
+          "decodeStatus",
+          "Message decoded successfully!",
+          "success"
+        );
+      } catch (error) {
+        showStatus(
+          "decodeStatus",
+          "The binary groups are not valid UTF-8 text.",
+          "error"
+        );
+      }
+    });
+
+    // CLEAR BINARY INPUT
+
+    document.getElementById("clearBinaryBtn").addEventListener("click", function () {
+      document.getElementById("binaryInput").value = "";
+
+      document.getElementById("decodedOutput").textContent =
+        "Your decoded message will appear here...";
+
+      showStatus("decodeStatus", "");
+    });
+
+    // COPY DECODED TEXT
+
+    document.getElementById("copyDecodedBtn").addEventListener("click", function () {
+      const text = document.getElementById("decodedOutput").textContent;
+
+      copyToClipboard(text, "decodeStatus", "Decoded text");
+    });
+
+    // NUMBER SYSTEM CONVERTER
+
+    function convertNumber() {
+      const input = document.getElementById("numberInput").value.trim();
+      const base = Number(document.getElementById("numberBase").value);
+
+      if (!input) {
+        showStatus(
+          "numberStatus",
+          "Please enter a number first.",
+          "error"
+        );
+
+        return;
+      }
+
+      let validPattern;
+
+      if (base === 2) {
+        validPattern = /^[01]+$/;
+      } else if (base === 10) {
+        validPattern = /^[0-9]+$/;
+      } else {
+        validPattern = /^[0-9a-fA-F]+$/;
+      }
+
+      if (!validPattern.test(input)) {
+        let expectedFormat = "";
+
+        if (base === 2) {
+          expectedFormat = "Binary numbers can contain only 0 and 1.";
+        } else if (base === 10) {
+          expectedFormat = "Decimal numbers can contain only digits 0–9.";
+        } else {
+          expectedFormat =
+            "Hexadecimal numbers can contain digits 0–9 and letters A–F.";
+        }
+
+        showStatus("numberStatus", expectedFormat, "error");
+        return;
+      }
+
+      const value = parseInt(input, base);
+
+      if (!Number.isSafeInteger(value) || value < 0) {
+        showStatus(
+          "numberStatus",
+          "Please enter a non-negative integer within the supported safe range.",
+          "error"
+        );
+
+        return;
+      }
+
+      document.getElementById("binaryResult").textContent =
+        value.toString(2);
+
+      document.getElementById("decimalResult").textContent =
+        value.toString(10);
+
+      document.getElementById("hexResult").textContent =
+        value.toString(16).toUpperCase();
+
+      showStatus(
+        "numberStatus",
+        "Number converted successfully!",
+        "success"
+      );
+    }
+
+    document
+      .getElementById("convertNumberBtn")
+      .addEventListener("click", convertNumber);
+
+    document.getElementById("numberInput").addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        convertNumber();
+      }
+    });
+
+    // CLEAR NUMBER CONVERTER
+
+    document.getElementById("clearNumberBtn").addEventListener("click", function () {
+      document.getElementById("numberInput").value = "";
+
+      document.getElementById("binaryResult").textContent = "—";
+      document.getElementById("decimalResult").textContent = "—";
+      document.getElementById("hexResult").textContent = "—";
+
+      showStatus("numberStatus", "");
+    });
+
+    // SHOW OR HIDE 8085 PROGRAM
+
+    document
+      .getElementById("toggleProgramBtn")
+      .addEventListener("click", function () {
+        const panel = document.getElementById("programPanel");
+        const button = document.getElementById("toggleProgramBtn");
+
+        const isVisible = panel.classList.toggle("visible");
+
+        button.textContent = isVisible ? "Hide Program" : "Show Program";
+        button.setAttribute("aria-expanded", String(isVisible));
+      });
+
+    // CURRENT YEAR IN FOOTER
+
+    document.getElementById("currentYear").textContent =
+      new Date().getFullYear();
+  </script>
+
+</body>
+</html>
